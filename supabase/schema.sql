@@ -140,13 +140,23 @@ end $$;
 -- ============================================================
 -- Optional starter content.
 -- Customize (or delete) these for each instance's graduate.
+-- Idempotent: rows are only inserted when the message/label isn't
+-- already present, so re-running this file is safe.
 -- ============================================================
-insert into public.wishes (name, message) values
+insert into public.wishes (name, message)
+select v.name, v.message
+from (values
   ('Mom & Dad', 'We are beyond proud of the person you have become. Watching you cross that stage was the honour of our lives. Congratulations, graduate!'),
   ('A Well-Wisher', 'From late-night study sessions to this moment — you did it! Wishing you every success in the next chapter.'),
-  ('Your Mentor', 'One of the brightest minds I have had the pleasure to teach. The future is yours. Go build wonderful things.');
+  ('Your Mentor', 'One of the brightest minds I have had the pleasure to teach. The future is yours. Go build wonderful things.')
+) as v(name, message)
+where not exists (
+  select 1 from public.wishes w where w.message = v.message
+);
 
-insert into public.blessings (label, hearts) values
+insert into public.blessings (label, hearts)
+select v.label, v.hearts
+from (values
   ('Endless Success', 8),
   ('Open Doors', 6),
   ('Divine Favor', 5),
@@ -154,4 +164,8 @@ insert into public.blessings (label, hearts) values
   ('Boundless Joy', 4),
   ('Wisdom & Growth', 3),
   ('Good Health', 5),
-  ('New Beginnings', 6);
+  ('New Beginnings', 6)
+) as v(label, hearts)
+where not exists (
+  select 1 from public.blessings b where b.label = v.label
+);
