@@ -25,13 +25,18 @@ cp .env.local.example .env.local   # fill in Supabase values
 pnpm dev
 ```
 
-Build and preview the static export:
+Build, test, and preview the static export:
 
 ```bash
-pnpm lint
-pnpm build        # emits out/
-pnpm preview      # serves out/ on http://localhost:3000
+pnpm lint        # eslint
+pnpm typecheck   # tsc --noEmit
+pnpm test        # vitest unit tests for the lib helpers
+pnpm build       # emits out/
+pnpm preview     # serves out/ on http://localhost:3000
+pnpm test:e2e    # Playwright smoke test (run pnpm build first)
 ```
+
+CI runs `lint` and `build` on every push/PR via `.github/workflows/ci.yml`.
 
 ## Environment variables
 
@@ -49,11 +54,38 @@ clear error state instead of crashing.
 1. Create a project at https://supabase.com.
 2. Open the SQL Editor and run `supabase/schema.sql`. It creates the
    `wishes`, `blessings`, and `rsvps` tables, Row Level Security (public
-   read/write), live guestbook publication, race-safe heart-increment
-   functions, and optional starter content
+   read of visible rows + public insert), live guestbook publication,
+   race-safe heart-increment functions, a private RSVP count
+   (`count_attending()`), and optional starter content
    (edit/delete the seed inserts per graduate).
 3. Copy the project URL and anon key from **Project Settings > API** into your
    env vars.
+
+### Moderating guestbook content
+
+Every wish and blessing has a `status` column (`visible`/`hidden`). To remove
+spam or inappropriate posts without touching code, run in the SQL editor or
+flip it in the Table editor:
+
+```sql
+update public.wishes set status = 'hidden' where id = '<row-id>';
+update public.blessings set status = 'hidden' where id = '<row-id>';
+```
+
+Hidden rows are no longer served by the select policies, so they disappear
+from the walls instantly.
+
+### Rate limiting (recommended)
+
+The anon key allows anyone to insert wishes/blessings/RSVPs and increment
+hearts, so add API-level rate limits in **Dashboard > API settings** for these
+endpoints to keep a public guestbook abuse-proof:
+
+- `POST /rest/v1/wishes`
+- `POST /rest/v1/blessings`
+- `POST /rest/v1/rsvps`
+- `POST /rest/v1/rpc/increment_wish_hearts`
+- `POST /rest/v1/rpc/increment_blessing_hearts`
 
 ## Deploy to Netlify
 

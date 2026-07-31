@@ -12,6 +12,14 @@ __v0_jsx-dev-runtime.ts
 # Build output
 out/
 
+# TypeScript incremental cache
+*.tsbuildinfo
+
+# Test artifacts
+test-results/
+playwright-report/
+.vitest/
+
 # Common ignores
 node_modules
 .next/

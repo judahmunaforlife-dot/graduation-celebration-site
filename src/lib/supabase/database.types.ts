@@ -15,6 +15,7 @@ export type Database = {
           name: string
           message: string
           hearts: number
+          status: string
           created_at: string
         }
         Insert: {
@@ -22,6 +23,7 @@ export type Database = {
           name?: string
           message: string
           hearts?: number
+          status?: string
           created_at?: string
         }
         Update: {
@@ -29,6 +31,7 @@ export type Database = {
           name?: string
           message?: string
           hearts?: number
+          status?: string
           created_at?: string
         }
         Relationships: []
@@ -38,18 +41,21 @@ export type Database = {
           id: string
           label: string
           hearts: number
+          status: string
           created_at: string
         }
         Insert: {
           id?: string
           label: string
           hearts?: number
+          status?: string
           created_at?: string
         }
         Update: {
           id?: string
           label?: string
           hearts?: number
+          status?: string
           created_at?: string
         }
         Relationships: []
@@ -88,6 +94,10 @@ export type Database = {
       increment_blessing_hearts: {
         Args: { row_id: string; delta?: number }
         Returns: undefined
+      }
+      count_attending: {
+        Args: Record<PropertyKey, never>
+        Returns: number
       }
     }
     Enums: { [_ in never]: never }

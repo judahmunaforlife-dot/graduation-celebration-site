@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Download, Loader2 } from 'lucide-react'
 import { graduate, portrait } from '@/lib/celebration-data'
+import { wrapText } from '@/lib/canvas-text'
 
 function loadImage(src: string) {
   return new Promise<HTMLImageElement>((resolve, reject) => {
@@ -27,23 +28,6 @@ function drawCover(
   const sourceX = (image.width - sourceWidth) / 2
   const sourceY = Math.max(0, (image.height - sourceHeight) * 0.28)
   context.drawImage(image, sourceX, sourceY, sourceWidth, sourceHeight, x, y, width, height)
-}
-
-function wrapText(context: CanvasRenderingContext2D, text: string, maxWidth: number) {
-  const words = text.split(' ')
-  const lines: string[] = []
-  let line = ''
-  for (const word of words) {
-    const next = line ? `${line} ${word}` : word
-    if (context.measureText(next).width > maxWidth && line) {
-      lines.push(line)
-      line = word
-    } else {
-      line = next
-    }
-  }
-  if (line) lines.push(line)
-  return lines
 }
 
 export function ShareCardButton() {
@@ -78,7 +62,7 @@ export function ShareCardButton() {
 
       context.fillStyle = '#f5b642'
       context.font = '700 34px Arial, sans-serif'
-      context.fillText('CLASS OF 2026', 76, 130)
+      context.fillText(graduate.date.toUpperCase(), 76, 130)
       context.fillStyle = '#ffffff'
       context.font = '700 82px Arial, sans-serif'
       let y = 265
