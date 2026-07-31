@@ -4,7 +4,8 @@ import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import confetti from 'canvas-confetti'
 import { Rocket } from 'lucide-react'
-import { graduate } from '@/lib/celebration-data'
+import Image from 'next/image'
+import { graduate, portrait } from '@/lib/celebration-data'
 
 const LINES = [
   '> Initializing Graduation System...',
@@ -69,6 +70,15 @@ export function LaunchScreen({ onLaunch }: Props) {
             aria-hidden
             className="pointer-events-none absolute left-1/2 top-1/2 h-[520px] w-[520px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/20 blur-[120px]"
           />
+          <Image
+            src={portrait.src}
+            alt=""
+            fill
+            priority
+            aria-hidden
+            className="pointer-events-none object-cover opacity-[0.08] blur-sm"
+          />
+          <div aria-hidden className="pointer-events-none absolute inset-0 bg-background/75" />
           <motion.div
             initial={{ opacity: 0, y: 30, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}

@@ -69,6 +69,41 @@ export function BlessingsWall() {
     }
   }, [])
 
+  useEffect(() => {
+    const client = supabase
+    if (!client) return
+
+    const channel = client
+      .channel('blessings-wall')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'blessings' },
+        (payload) => {
+          const blessing = payload.new as Blessing
+          setBlessings((prev) =>
+            prev.some((item) => item.id === blessing.id)
+              ? prev
+              : [...prev, blessing].slice(-100),
+          )
+        },
+      )
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'blessings' },
+        (payload) => {
+          const blessing = payload.new as Blessing
+          setBlessings((prev) =>
+            prev.map((item) => (item.id === blessing.id ? blessing : item)),
+          )
+        },
+      )
+      .subscribe()
+
+    return () => {
+      void client.removeChannel(channel)
+    }
+  }, [])
+
   const add = async (e: React.FormEvent) => {
     e.preventDefault()
     const label = value.trim()
@@ -116,7 +151,7 @@ export function BlessingsWall() {
   }
 
   return (
-    <section id="blessings" className="mx-auto max-w-5xl px-4 py-24">
+    <section id="blessings" className="mx-auto max-w-5xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
       <div className="glass rounded-3xl border border-border p-6 sm:p-10">
         <SectionHeading
           icon={Sparkles}
@@ -167,7 +202,7 @@ export function BlessingsWall() {
                     whileTap={{ scale: 0.94 }}
                     onClick={() => void like(b.id)}
                     aria-pressed={!!liked[b.id]}
-                    className={`glass flex items-center gap-2 rounded-full border px-5 py-2.5 font-semibold transition-colors ${
+                    className={`glass flex min-h-12 items-center gap-2 rounded-full border px-5 py-2.5 font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${
                       liked[b.id]
                         ? 'border-primary text-primary'
                         : 'border-border text-foreground hover:border-accent/50'

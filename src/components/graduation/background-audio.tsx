@@ -75,33 +75,43 @@ export function BackgroundAudio({ active }: Props) {
 
   // Start audio when the celebration launches.
   useEffect(() => {
-    if (!active || started) return
+    if (!active || ctxRef.current) return
     const Ctx =
       window.AudioContext ||
       (window as unknown as { webkitAudioContext: typeof AudioContext })
         .webkitAudioContext
     if (!Ctx) return
+
+    let cancelled = false
     const ctx = new Ctx()
     const master = ctx.createGain()
     master.gain.value = 0.6
     master.connect(ctx.destination)
     ctxRef.current = ctx
     masterRef.current = master
-    void ctx.resume().then(() => setStarted(true))
-    scheduleBar()
-    intervalRef.current = setInterval(scheduleBar, BAR_SECONDS * 1000)
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current)
-    }
-  }, [active, started, scheduleBar])
 
-  // Close the audio context on unmount.
-  useEffect(() => {
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current)
-      void ctxRef.current?.close()
+    const startAudio = async () => {
+      await ctx.resume()
+      if (cancelled) return
+
+      setStarted(true)
+      scheduleBar()
+      intervalRef.current = setInterval(scheduleBar, BAR_SECONDS * 1000)
     }
-  }, [])
+
+    void startAudio()
+
+    return () => {
+      cancelled = true
+      if (intervalRef.current) clearInterval(intervalRef.current)
+      intervalRef.current = null
+      if (ctxRef.current === ctx) {
+        ctxRef.current = null
+        masterRef.current = null
+      }
+      void ctx.close()
+    }
+  }, [active, scheduleBar])
 
   const toggleMute = useCallback(() => {
     const master = masterRef.current

@@ -2,8 +2,8 @@
 
 import Image from 'next/image'
 import { motion } from 'framer-motion'
-import { Sparkles, PartyPopper, Heart, HandHeart, Images } from 'lucide-react'
-import { graduate } from '@/lib/celebration-data'
+import { Sparkles, PartyPopper, Heart, HandHeart, Images, ChevronDown } from 'lucide-react'
+import { graduate, portrait } from '@/lib/celebration-data'
 
 function scrollTo(id: string) {
   document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
@@ -11,7 +11,7 @@ function scrollTo(id: string) {
 
 export function Hero() {
   return (
-    <section className="relative flex min-h-screen flex-col items-center justify-center px-4 py-20 text-center">
+    <section id="hero" className="relative flex min-h-screen flex-col items-center justify-center px-4 py-14 text-center sm:px-6 sm:py-20 lg:px-8">
       <motion.span
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -26,7 +26,7 @@ export function Hero() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2, duration: 0.6 }}
-        className="text-balance text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-6xl md:text-7xl"
+        className="text-balance text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-6xl md:text-7xl lg:text-8xl"
       >
         <span className="text-foreground">Congratulations,</span>
         <span className="text-gradient animate-shimmer mt-2 block">
@@ -58,7 +58,7 @@ export function Hero() {
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.6, duration: 0.7 }}
-        className="relative mt-12"
+        className="relative mt-10"
       >
         <div
           aria-hidden
@@ -67,20 +67,21 @@ export function Hero() {
         <motion.div
           animate={{ y: [0, -10, 0] }}
           transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
-          className="relative w-[300px] sm:w-[360px]"
+          className="relative w-full max-w-[390px] sm:max-w-[510px] lg:max-w-[580px]"
         >
           {/* portrait sits inside the frame's transparent opening */}
           <div
             className="absolute z-0 overflow-hidden rounded-sm"
-            style={{ top: '19%', bottom: '19.5%', left: '28.5%', right: '28%' }}
+            style={{ top: '26.5%', bottom: '23.5%', left: '29.5%', right: '30%' }}
           >
             <Image
-              src="/graduate-portrait.png"
+              src={portrait.src}
               alt={`Portrait of ${graduate.fullName} in graduation cap and gown`}
               fill
               priority
-              sizes="360px"
+              sizes="(min-width: 1024px) 580px, (min-width: 640px) 510px, 100vw"
               className="object-cover"
+              style={{ objectPosition: portrait.objectPosition }}
             />
           </div>
           {/* carved gold frame overlay */}
@@ -104,7 +105,7 @@ export function Hero() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.8 }}
-        className="glass mt-16 max-w-2xl rounded-2xl border border-accent/30 p-6 sm:p-8"
+        className="glass mt-12 max-w-2xl rounded-2xl border border-accent/30 p-6 sm:p-8"
       >
         <p className="text-pretty text-base italic leading-relaxed text-foreground/90 sm:text-lg">
           “{graduate.quote}”
@@ -116,7 +117,7 @@ export function Hero() {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1 }}
-        className="mt-10 flex flex-wrap items-center justify-center gap-3"
+        className="mt-10 flex max-w-2xl flex-wrap items-center justify-center gap-3"
       >
         <button
           type="button"
@@ -143,6 +144,15 @@ export function Hero() {
           View Memories
         </button>
       </motion.div>
+
+      <button
+        type="button"
+        onClick={() => scrollTo('achievements')}
+        className="mt-10 inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+      >
+        Scroll to celebrate
+        <ChevronDown className="h-4 w-4 animate-bounce" />
+      </button>
     </section>
   )
 }

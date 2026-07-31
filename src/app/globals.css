@@ -80,6 +80,63 @@
   --plum: oklch(0.17 0.055 315);
 }
 
+:root[data-theme='rose'] {
+  --background: oklch(0.2 0.055 10);
+  --card: oklch(0.27 0.07 8);
+  --primary: oklch(0.7 0.2 15);
+  --accent: oklch(0.84 0.13 70);
+  --plum: oklch(0.2 0.055 10);
+}
+
+:root[data-theme='black'] {
+  --background: oklch(0.12 0 0);
+  --foreground: oklch(0.96 0 0);
+  --card: oklch(0.18 0 0);
+  --primary: oklch(0.76 0 0);
+  --accent: oklch(0.9 0 0);
+  --plum: oklch(0.12 0 0);
+}
+
+:root[data-theme='gold'] {
+  --background: oklch(0.18 0.035 80);
+  --card: oklch(0.25 0.055 80);
+  --primary: oklch(0.78 0.15 85);
+  --accent: oklch(0.9 0.12 95);
+  --plum: oklch(0.18 0.035 80);
+}
+
+:root[data-theme='pink'] {
+  --background: oklch(0.2 0.06 350);
+  --card: oklch(0.27 0.08 350);
+  --primary: oklch(0.74 0.2 350);
+  --accent: oklch(0.88 0.1 35);
+  --plum: oklch(0.2 0.06 350);
+}
+
+:root[data-theme='lemon'] {
+  --background: oklch(0.19 0.04 105);
+  --card: oklch(0.26 0.06 105);
+  --primary: oklch(0.82 0.17 105);
+  --accent: oklch(0.9 0.14 120);
+  --plum: oklch(0.19 0.04 105);
+}
+
+:root[data-theme='midnight'] {
+  --background: oklch(0.17 0.035 260);
+  --card: oklch(0.23 0.045 260);
+  --primary: oklch(0.7 0.14 250);
+  --accent: oklch(0.84 0.13 95);
+  --plum: oklch(0.17 0.035 260);
+}
+
+:root[data-theme='school'] {
+  --background: oklch(0.18 0.045 155);
+  --card: oklch(0.24 0.055 155);
+  --primary: oklch(0.7 0.17 155);
+  --accent: oklch(0.84 0.14 90);
+  --plum: oklch(0.18 0.045 155);
+}
+
 @layer base {
   * {
     @apply border-border;
@@ -87,6 +144,7 @@
   body {
     @apply bg-background text-foreground;
     font-family: var(--font-sans);
+    overflow-x: hidden;
   }
 }
 
@@ -122,6 +180,17 @@
   animation: shimmer 5s linear infinite;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 ::-webkit-scrollbar {
   width: 10px;
 }
@@ -131,4 +200,11 @@
 ::-webkit-scrollbar-thumb {
   background: color-mix(in oklch, var(--primary) 55%, transparent);
   border-radius: 999px;
+}
+
+@media (max-width: 374px) {
+  .glass {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
 }

@@ -7,7 +7,7 @@ import { SectionHeading } from './section-heading'
 
 export function Achievements() {
   return (
-    <section id="achievements" className="mx-auto max-w-6xl px-4 py-24">
+    <section id="achievements" className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
       <SectionHeading
         icon={Trophy}
         title="Achievements"

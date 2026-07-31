@@ -12,6 +12,28 @@ type Wish = Database['public']['Tables']['wishes']['Row']
 
 const MAX = 500
 
+function initials(name: string) {
+  return name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join('')
+    .toUpperCase()
+}
+
+function displayDate(value: string) {
+  const elapsed = Date.now() - new Date(value).getTime()
+  const minutes = Math.floor(elapsed / 60_000)
+  if (minutes < 1) return 'Just now'
+  if (minutes < 60) return `${minutes}m ago`
+  const hours = Math.floor(minutes / 60)
+  if (hours < 24) return `${hours}h ago`
+  const days = Math.floor(hours / 24)
+  if (days < 7) return `${days}d ago`
+  return new Date(value).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+}
+
 export function MomentsWall() {
   const [wishes, setWishes] = useState<Wish[]>([])
   const [name, setName] = useState('')
@@ -71,6 +93,37 @@ export function MomentsWall() {
     }
   }, [])
 
+  useEffect(() => {
+    const client = supabase
+    if (!client) return
+
+    const channel = client
+      .channel('wishes-wall')
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'wishes' },
+        (payload) => {
+          const wish = payload.new as Wish
+          setWishes((prev) =>
+            prev.some((item) => item.id === wish.id) ? prev : [wish, ...prev].slice(0, 100),
+          )
+        },
+      )
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'wishes' },
+        (payload) => {
+          const wish = payload.new as Wish
+          setWishes((prev) => prev.map((item) => (item.id === wish.id ? wish : item)))
+        },
+      )
+      .subscribe()
+
+    return () => {
+      void client.removeChannel(channel)
+    }
+  }, [])
+
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
     const text = message.trim()
@@ -122,14 +175,14 @@ export function MomentsWall() {
   }
 
   return (
-    <section id="moments" className="mx-auto max-w-6xl px-4 py-24">
+    <section id="moments" className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
       <SectionHeading
         icon={MessageCircleHeart}
         title="Moments Wall"
         subtitle="Leave a heartfelt note for the graduate. Share a memory, a laugh, or a word of pride."
       />
 
-      <div className="mt-14 grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
+      <div className="mt-10 grid gap-8 sm:mt-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]">
         <motion.form
           onSubmit={submit}
           initial={{ opacity: 0, x: -24 }}
@@ -220,23 +273,32 @@ export function MomentsWall() {
           {status === 'ready' && wishes.length > 0 && (
             <div className="max-h-[520px] space-y-4 overflow-y-auto pr-2">
               <AnimatePresence initial={false}>
-                {wishes.map((w) => (
+                {wishes.map((w, index) => (
                   <motion.article
                     key={w.id}
                     layout
                     initial={{ opacity: 0, y: -12, scale: 0.98 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
-                    className="glass rounded-2xl border border-border p-5"
+                    className={`glass rounded-2xl border p-5 ${
+                      index % 2 === 0 ? 'border-primary/25' : 'border-accent/30'
+                    }`}
                   >
                     <div className="mb-2 flex items-center justify-between gap-2">
-                      <span className="font-bold text-foreground">
-                        {w.name}
-                      </span>
+                      <div className="flex min-w-0 items-center gap-3">
+                        <span
+                          aria-hidden
+                          className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-extrabold ${
+                            index % 2 === 0
+                              ? 'bg-primary/20 text-primary'
+                              : 'bg-accent/20 text-accent'
+                          }`}
+                        >
+                          {initials(w.name)}
+                        </span>
+                        <span className="truncate font-bold text-foreground">{w.name}</span>
+                      </div>
                       <span className="font-mono text-xs text-muted-foreground">
-                        {new Date(w.created_at).toLocaleDateString(undefined, {
-                          month: 'short',
-                          day: 'numeric',
-                        })}
+                        {displayDate(w.created_at)}
                       </span>
                     </div>
                     <p className="text-pretty leading-relaxed text-foreground/85">
@@ -245,7 +307,7 @@ export function MomentsWall() {
                     <button
                       type="button"
                       onClick={() => void like(w.id)}
-                      className="mt-4 inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1 text-sm text-muted-foreground transition-colors hover:border-primary/50 hover:text-primary"
+                      className="mt-4 inline-flex min-h-11 items-center gap-1.5 rounded-full border border-border px-4 py-2 text-sm text-muted-foreground transition-colors hover:border-primary/50 hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                       aria-pressed={!!liked[w.id]}
                     >
                       <Heart

@@ -21,10 +21,21 @@ create table if not exists public.blessings (
   created_at timestamptz not null default now()
 );
 
+-- Event RSVPs
+create table if not exists public.rsvps (
+  id uuid primary key default gen_random_uuid(),
+  name text not null check (char_length(name) between 1 and 60),
+  attending boolean not null,
+  guests integer not null default 0 check (guests between 0 and 6),
+  created_at timestamptz not null default now(),
+  check ((attending and guests between 1 and 6) or (not attending and guests = 0))
+);
+
 -- Row Level Security: everyone can read + write, since this is a
 -- public guestbook. No auth required.
 alter table public.wishes enable row level security;
 alter table public.blessings enable row level security;
+alter table public.rsvps enable row level security;
 
 create policy "public read wishes" on public.wishes
   for select using (true);
@@ -36,6 +47,12 @@ create policy "public read blessings" on public.blessings
   for select using (true);
 
 create policy "public insert blessings" on public.blessings
+  for insert with check (true);
+
+create policy "public read rsvps" on public.rsvps
+  for select using (true);
+
+create policy "public insert rsvps" on public.rsvps
   for insert with check (true);
 
 -- Race-safe heart increments (avoids lost updates from concurrent likes).
@@ -66,6 +83,22 @@ revoke execute on function public.increment_wish_hearts(uuid, int) from public;
 revoke execute on function public.increment_blessing_hearts(uuid, int) from public;
 grant execute on function public.increment_wish_hearts(uuid, int) to anon, authenticated;
 grant execute on function public.increment_blessing_hearts(uuid, int) to anon, authenticated;
+
+-- Enable live updates for the public guestbook walls. The blocks are safe to
+-- re-run after the tables have already been added to the publication.
+do $$
+begin
+  alter publication supabase_realtime add table public.wishes;
+exception
+  when duplicate_object then null;
+end $$;
+
+do $$
+begin
+  alter publication supabase_realtime add table public.blessings;
+exception
+  when duplicate_object then null;
+end $$;
 
 -- ============================================================
 -- Optional starter content.

@@ -1,8 +1,9 @@
 # Graduation Celebration Site
 
 A single-page graduation celebration site with a launch screen, floating
-decorations, an audio synth backdrop, confetti, and two live guestbook walls
-(Moments + Blessings) backed by Supabase.
+decorations, an audio synth backdrop, confetti, themed UI presets, a journey
+timeline, share-card downloads, event RSVP, and live guestbook walls backed by
+Supabase.
 
 ## Tech stack
 
@@ -47,8 +48,9 @@ clear error state instead of crashing.
 
 1. Create a project at https://supabase.com.
 2. Open the SQL Editor and run `supabase/schema.sql`. It creates the
-   `wishes` and `blessings` tables, Row Level Security (public read/write),
-   race-safe heart-increment functions, and optional starter content
+   `wishes`, `blessings`, and `rsvps` tables, Row Level Security (public
+   read/write), live guestbook publication, race-safe heart-increment
+   functions, and optional starter content
    (edit/delete the seed inserts per graduate).
 3. Copy the project URL and anon key from **Project Settings > API** into your
    env vars.
@@ -61,7 +63,10 @@ clear error state instead of crashing.
    - Build command: `pnpm build`
    - Publish directory: `out`
    - Node version: `22`
-4. Add the environment variables from the table above.
+4. Add the environment variables from the table above. Set
+   `NEXT_PUBLIC_SITE_URL` to your final custom domain (e.g.
+   `https://celebrate.example.com`) so Open Graph tags, `sitemap.xml`, and
+   `robots.txt` point at the right host.
 5. Deploy.
 
 ## Creating another instance (one site per graduate)
@@ -74,12 +79,21 @@ Supabase project, so all data is fully isolated.
    `supabase/schema.sql` in its SQL Editor.
 3. **Personalize content** in `src/lib/celebration-data.ts`:
    - `graduate` (name, degree, school, quote)
+   - `siteTheme` (`luxury`, `black`, `gold`, `pink`, `lemon`, `rose`, `midnight`, or `school`)
    - `achievements` list
    - `memories` captions
 4. **Swap the photos** in `public/` (`graduate-portrait.png`, `memory-1..3.png`).
-5. **Create a new Netlify site** from the new repo and set its env vars
+   For a new portrait, adjust `portrait.objectPosition` in
+   `src/lib/celebration-data.ts` if needed to keep the subject centered in the
+   decorative frame.
+5. **Set the event details** in `celebrationEvent` in
+   `src/lib/celebration-data.ts`. Set `celebrationEvent.rsvpEnabled` to `true`
+   only when this instance should collect RSVPs. When `false` (the default for
+   a first deploy), the entire "Celebrate With Us" section is hidden and the
+   `rsvps` table goes unused.
+6. **Create a new Netlify site** from the new repo and set its env vars
    (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`).
-6. Deploy. Repeat for the next graduate.
+7. Deploy. Repeat for the next graduate.
 
 ## Scripts
 

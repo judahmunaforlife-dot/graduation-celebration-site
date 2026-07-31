@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import { siteUrl } from '@/lib/site'
+import { siteTheme } from '@/lib/celebration-data'
 import './globals.css'
 
 const geistSans = Geist({
@@ -35,7 +36,7 @@ export const metadata: Metadata = {
     url: '/',
     images: [
       {
-        url: '/graduate-portrait.png',
+        url: new URL('/graduate-portrait.png', siteUrl),
         width: 800,
         height: 1000,
         alt: 'A beautiful graduation celebration',
@@ -64,6 +65,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      data-theme={siteTheme}
       className={`dark ${geistSans.variable} ${geistMono.variable} bg-background`}
     >
       <body className="antialiased">{children}</body>
