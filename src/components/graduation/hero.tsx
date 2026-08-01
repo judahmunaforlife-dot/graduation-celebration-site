@@ -29,7 +29,7 @@ export function Hero() {
         className="text-balance text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-6xl md:text-7xl lg:text-8xl"
       >
         <span className="text-foreground">Congratulations,</span>
-        <span className="text-gradient animate-shimmer mt-2 block">
+        <span className="text-gradient animate-shimmer mt-2 block font-[family-name:var(--font-cormorant)] font-semibold tracking-normal">
           {graduate.fullName}
         </span>
       </motion.h1>

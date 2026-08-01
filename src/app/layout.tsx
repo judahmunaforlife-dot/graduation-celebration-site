@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
+import { Geist, Geist_Mono, Cormorant_Garamond } from 'next/font/google'
 import { siteUrl } from '@/lib/site'
 import { siteTheme } from '@/lib/celebration-data'
 import './globals.css'
@@ -12,6 +12,12 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   subsets: ['latin'],
   variable: '--font-geist-mono',
+})
+
+const cormorant = Cormorant_Garamond({
+  subsets: ['latin'],
+  weight: ['500', '600', '700'],
+  variable: '--font-cormorant',
 })
 
 const siteName = 'Graduation Celebration'
@@ -66,7 +72,7 @@ export default function RootLayout({
     <html
       lang="en"
       data-theme={siteTheme}
-      className={`dark ${geistSans.variable} ${geistMono.variable} bg-background`}
+      className={`dark ${geistSans.variable} ${geistMono.variable} ${cormorant.variable} bg-background`}
     >
       <body className="antialiased">{children}</body>
     </html>

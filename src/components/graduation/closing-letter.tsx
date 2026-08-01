@@ -177,6 +177,16 @@ export function ClosingLetter() {
         <p className="mt-2 text-sm text-muted-foreground">
           Celebrating a beautiful milestone, today and always.
         </p>
+        <p className="mt-4 text-sm">
+          <a
+            href="https://wa.me/2348037529210"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-muted-foreground underline decoration-muted-foreground/40 underline-offset-4 transition-colors hover:text-foreground hover:decoration-foreground"
+          >
+            muna.him
+          </a>
+        </p>
       </footer>
     </section>
   )

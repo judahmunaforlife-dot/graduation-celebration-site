@@ -42,6 +42,8 @@ export function ShareCardButton() {
       const context = canvas.getContext('2d')
       if (!context) return
 
+      await document.fonts.load('700 82px "Cormorant Garamond"')
+
       const gradient = context.createLinearGradient(0, 0, 1080, 1350)
       gradient.addColorStop(0, '#2a0f2e')
       gradient.addColorStop(0.55, '#61164c')
@@ -64,7 +66,7 @@ export function ShareCardButton() {
       context.font = '700 34px Arial, sans-serif'
       context.fillText(graduate.date.toUpperCase(), 76, 130)
       context.fillStyle = '#ffffff'
-      context.font = '700 82px Arial, sans-serif'
+      context.font = '700 82px "Cormorant Garamond", Georgia, serif'
       let y = 265
       for (const line of wrapText(context, `Congratulations, ${graduate.fullName}`, 560)) {
         context.fillText(line, 76, y)
