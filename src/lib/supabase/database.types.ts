@@ -12,6 +12,7 @@ export type Database = {
       wishes: {
         Row: {
           id: string
+          instance_id: string
           name: string
           message: string
           hearts: number
@@ -20,6 +21,7 @@ export type Database = {
         }
         Insert: {
           id?: string
+          instance_id?: string
           name?: string
           message: string
           hearts?: number
@@ -28,6 +30,7 @@ export type Database = {
         }
         Update: {
           id?: string
+          instance_id?: string
           name?: string
           message?: string
           hearts?: number
@@ -39,6 +42,7 @@ export type Database = {
       blessings: {
         Row: {
           id: string
+          instance_id: string
           label: string
           hearts: number
           status: string
@@ -46,6 +50,7 @@ export type Database = {
         }
         Insert: {
           id?: string
+          instance_id?: string
           label: string
           hearts?: number
           status?: string
@@ -53,6 +58,7 @@ export type Database = {
         }
         Update: {
           id?: string
+          instance_id?: string
           label?: string
           hearts?: number
           status?: string
@@ -63,6 +69,7 @@ export type Database = {
       rsvps: {
         Row: {
           id: string
+          instance_id: string
           name: string
           attending: boolean
           guests: number
@@ -70,6 +77,7 @@ export type Database = {
         }
         Insert: {
           id?: string
+          instance_id?: string
           name: string
           attending: boolean
           guests?: number
@@ -77,6 +85,7 @@ export type Database = {
         }
         Update: {
           id?: string
+          instance_id?: string
           name?: string
           attending?: boolean
           guests?: number
@@ -96,7 +105,7 @@ export type Database = {
         Returns: undefined
       }
       count_attending: {
-        Args: Record<PropertyKey, never>
+        Args: { p_instance_id: string }
         Returns: number
       }
     }

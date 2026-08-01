@@ -7,6 +7,7 @@ import { MessageCircleHeart, Heart, Send, Loader2 } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
 import type { Database } from '@/lib/supabase/database.types'
 import { initials, displayDate } from '@/lib/format'
+import { instanceId } from '@/lib/celebration-data'
 import { SectionHeading } from './section-heading'
 
 type Wish = Database['public']['Tables']['wishes']['Row']
@@ -33,6 +34,7 @@ export function MomentsWall() {
     const { data, error } = await supabase
       .from('wishes')
       .select('*')
+      .eq('instance_id', instanceId)
       .order('created_at', { ascending: false })
       .limit(100)
     if (error) {
@@ -55,6 +57,7 @@ export function MomentsWall() {
       const { data, error } = await supabase
         .from('wishes')
         .select('*')
+        .eq('instance_id', instanceId)
         .order('created_at', { ascending: false })
         .limit(100)
       if (cancelled) return
@@ -80,7 +83,12 @@ export function MomentsWall() {
       .channel('wishes-wall')
       .on(
         'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'wishes' },
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'wishes',
+          filter: `instance_id=eq.${instanceId}`,
+        },
         (payload) => {
           const wish = payload.new as Wish
           setWishes((prev) =>
@@ -90,7 +98,12 @@ export function MomentsWall() {
       )
       .on(
         'postgres_changes',
-        { event: 'UPDATE', schema: 'public', table: 'wishes' },
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'wishes',
+          filter: `instance_id=eq.${instanceId}`,
+        },
         (payload) => {
           const wish = payload.new as Wish
           setWishes((prev) => prev.map((item) => (item.id === wish.id ? wish : item)))
@@ -110,7 +123,7 @@ export function MomentsWall() {
     setSubmitting(true)
     const { data, error } = await supabase
       .from('wishes')
-      .insert({ name: name.trim() || 'A well-wisher', message: text })
+      .insert({ name: name.trim() || 'A well-wisher', message: text, instance_id: instanceId })
       .select()
       .single()
     setSubmitting(false)

@@ -103,29 +103,50 @@ endpoints to keep a public guestbook abuse-proof:
 
 ## Creating another instance (one site per graduate)
 
-Each graduate gets a full clone with its own repo, Netlify site, and its own
-Supabase project, so all data is fully isolated.
+Each graduate gets a full clone with its own repo and Netlify site. Supabase
+can be set up two ways:
 
-1. **Fork/clone this repo** into a new GitHub repository.
-2. **Create a new Supabase project** for this instance and run
-   `supabase/schema.sql` in its SQL Editor.
-3. **Personalize content** in `src/lib/celebration-data.ts`:
+- **Isolated (default):** each instance gets its own Supabase project, so all
+  data is fully separate.
+- **Shared:** multiple Netlify sites point at the **same** Supabase project.
+  All instances write into the same `wishes`, `blessings`, and `rsvps` tables,
+  and each site only shows rows sent for its own instance id (set via
+  `NEXT_PUBLIC_INSTANCE_ID`).
+
+### Setup (shared Supabase)
+
+1. **Fork/clone this repo** into a new GitHub repository (per graduate).
+2. **Personalize content** in `src/lib/celebration-data.ts`:
    - `graduate` (name, degree, school, quote)
    - `siteTheme` (`luxury`, `black`, `gold`, `pink`, `lemon`, `rose`, `midnight`, or `school`)
    - `achievements` list
    - `memories` captions
-4. **Swap the photos** in `public/` (`graduate-portrait.png`, `memory-1..3.png`).
+3. **Swap the photos** in `public/` (`graduate-portrait.png`, `memory-1..3.png`).
    For a new portrait, adjust `portrait.objectPosition` in
    `src/lib/celebration-data.ts` if needed to keep the subject centered in the
    decorative frame.
-5. **Set the event details** in `celebrationEvent` in
+4. **Set the event details** in `celebrationEvent` in
    `src/lib/celebration-data.ts`. Set `celebrationEvent.rsvpEnabled` to `true`
    only when this instance should collect RSVPs. When `false` (the default for
    a first deploy), the entire "Celebrate With Us" section is hidden and the
    `rsvps` table goes unused.
-6. **Create a new Netlify site** from the new repo and set its env vars
-   (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`).
-7. Deploy. Repeat for the next graduate.
+5. **Run `supabase/schema.sql` once** in the shared project's SQL Editor (it is
+   idempotent and safe to re-run).
+6. **Create a new Netlify site** from the new repo and set its env vars:
+   - `NEXT_PUBLIC_SUPABASE_URL` — the shared project URL (same for every site)
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` — the shared project anon key (same)
+   - `NEXT_PUBLIC_INSTANCE_ID` — a **unique** value per site, e.g. `chelsea`
+7. Deploy. Repeat for the next graduate with a different `NEXT_PUBLIC_INSTANCE_ID`.
+
+Notes:
+
+- If `NEXT_PUBLIC_INSTANCE_ID` is unset, the site uses `'default'`, so a
+  single-instance deployment keeps working after the schema update.
+- Realtime updates are filtered per instance, so live wishes/blessings only
+  appear on the site they were sent to.
+- The anon key is shared, so filtering happens in the site's queries; anyone
+  with the key could still read another instance's rows via the API directly.
+  Use isolated Supabase projects if hard data isolation is required.
 
 ## Scripts
 

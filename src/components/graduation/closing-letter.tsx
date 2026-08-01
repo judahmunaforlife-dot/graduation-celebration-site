@@ -102,14 +102,14 @@ export function ClosingLetter() {
           <Heart className="h-8 w-8 text-primary" />
         </div>
         <h2 className="text-2xl font-extrabold text-gradient sm:text-3xl">
-          A Special Message For You
+          Final Message
         </h2>
         <div className="mx-auto my-6 h-px w-24 bg-border" />
         <p className="text-pretty text-base italic leading-relaxed text-foreground/90 sm:text-lg">
-          This little site was made to honour everything you have worked for.
-          May this new chapter bring you closer to your dreams, surround you
-          with genuine love, and fill your heart with peace and purpose.
-          Congratulations, graduate — you are deeply celebrated.
+          This journey wasn&apos;t just about earning a degree. It was about becoming
+          resilient, embracing failure, celebrating growth, and discovering that
+          with persistence and faith, impossible things become possible. Here&apos;s
+          to the next chapter.
         </p>
         <p className="mt-8 font-mono text-xs uppercase tracking-widest text-primary">
           Closing Letter

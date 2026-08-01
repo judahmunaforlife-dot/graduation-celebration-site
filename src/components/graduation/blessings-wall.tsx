@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Sparkles, Heart, Plus, Loader2 } from 'lucide-react'
 import { supabase } from '@/lib/supabase/client'
 import type { Database } from '@/lib/supabase/database.types'
+import { instanceId } from '@/lib/celebration-data'
 import { SectionHeading } from './section-heading'
 
 type Blessing = Database['public']['Tables']['blessings']['Row']
@@ -30,6 +31,7 @@ export function BlessingsWall() {
     const { data, error } = await supabase
       .from('blessings')
       .select('*')
+      .eq('instance_id', instanceId)
       .order('created_at', { ascending: true })
       .limit(100)
     if (error) {
@@ -52,6 +54,7 @@ export function BlessingsWall() {
       const { data, error } = await supabase
         .from('blessings')
         .select('*')
+        .eq('instance_id', instanceId)
         .order('created_at', { ascending: true })
         .limit(100)
       if (cancelled) return
@@ -77,7 +80,12 @@ export function BlessingsWall() {
       .channel('blessings-wall')
       .on(
         'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'blessings' },
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'blessings',
+          filter: `instance_id=eq.${instanceId}`,
+        },
         (payload) => {
           const blessing = payload.new as Blessing
           setBlessings((prev) =>
@@ -89,7 +97,12 @@ export function BlessingsWall() {
       )
       .on(
         'postgres_changes',
-        { event: 'UPDATE', schema: 'public', table: 'blessings' },
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'blessings',
+          filter: `instance_id=eq.${instanceId}`,
+        },
         (payload) => {
           const blessing = payload.new as Blessing
           setBlessings((prev) =>
@@ -111,7 +124,7 @@ export function BlessingsWall() {
     setSubmitting(true)
     const { data, error } = await supabase
       .from('blessings')
-      .insert({ label })
+      .insert({ label, instance_id: instanceId })
       .select()
       .single()
     setSubmitting(false)

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { CalendarDays, Clock3, MapPin, Send, Users } from 'lucide-react'
-import { celebrationEvent } from '@/lib/celebration-data'
+import { celebrationEvent, instanceId } from '@/lib/celebration-data'
 import { getCountdown, isEventOver, type Countdown } from '@/lib/countdown'
 import { supabase } from '@/lib/supabase/client'
 import { SectionHeading } from './section-heading'
@@ -26,7 +26,9 @@ export function EventRsvp() {
     const client = supabase
     if (!client) return
     const loadCount = async () => {
-      const { data, error } = await client.rpc('count_attending')
+      const { data, error } = await client.rpc('count_attending', {
+        p_instance_id: instanceId,
+      })
       if (error) {
         console.error('Failed to load attendee count:', error.message)
         return
@@ -44,6 +46,7 @@ export function EventRsvp() {
       name: name.trim(),
       attending,
       guests: attending ? Number(guests) : 0,
+      instance_id: instanceId,
     })
     if (error) {
       setStatus('error')

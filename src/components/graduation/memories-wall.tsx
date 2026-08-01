@@ -76,14 +76,26 @@ export function MemoriesWall() {
             className="group relative overflow-hidden rounded-2xl border-2 border-accent/40 bg-card p-2 text-left shadow-xl shadow-primary/10"
           >
             <div className="overflow-hidden rounded-xl">
-              <Image
-                src={m.src || '/placeholder.svg'}
-                alt={m.caption}
-                width={500}
-                height={620}
-                sizes="(min-width: 1024px) 31vw, (min-width: 640px) 46vw, 100vw"
-                className="h-64 w-full object-cover transition-transform duration-500 group-hover:scale-110 sm:h-72 lg:h-80"
-              />
+              {m.type === 'video' ? (
+                <video
+                  src={m.src}
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  preload="metadata"
+                  className="aspect-[3/4] w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                />
+              ) : (
+                <Image
+                  src={m.src || '/placeholder.svg'}
+                  alt={m.caption}
+                  width={500}
+                  height={620}
+                  sizes="(min-width: 1024px) 31vw, (min-width: 640px) 46vw, 100vw"
+                  className="aspect-[3/4] w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                />
+              )}
             </div>
             <div className="absolute inset-x-2 bottom-2 rounded-xl bg-gradient-to-t from-background/95 to-transparent p-4 pt-10">
               <p className="text-sm font-semibold text-foreground">
@@ -114,14 +126,24 @@ export function MemoriesWall() {
               aria-labelledby="memory-caption"
               className="relative max-w-lg overflow-hidden rounded-2xl border-4 border-accent/60 bg-card p-3"
             >
-              <Image
-                src={memories[active].src || '/placeholder.svg'}
-                alt={memories[active].caption}
-                width={640}
-                height={800}
-                sizes="(max-width: 640px) 92vw, 512px"
-                className="max-h-[70vh] w-auto rounded-xl object-contain"
-              />
+              {memories[active].type === 'video' ? (
+                <video
+                  src={memories[active].src}
+                  controls
+                  autoPlay
+                  playsInline
+                  className="max-h-[70vh] w-auto rounded-xl object-contain"
+                />
+              ) : (
+                <Image
+                  src={memories[active].src || '/placeholder.svg'}
+                  alt={memories[active].caption}
+                  width={640}
+                  height={800}
+                  sizes="(max-width: 640px) 92vw, 512px"
+                  className="max-h-[70vh] w-auto rounded-xl object-contain"
+                />
+              )}
               <p id="memory-caption" className="mt-3 text-center font-semibold text-foreground">
                 {memories[active].caption}
               </p>

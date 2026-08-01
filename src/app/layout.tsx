@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     url: '/',
     images: [
       {
-        url: new URL('/graduate-portrait.png', siteUrl),
+        url: new URL('/images/graduate-portrait1.jpg', siteUrl),
         width: 800,
         height: 1000,
         alt: 'A beautiful graduation celebration',
@@ -47,7 +47,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title,
     description,
-    images: ['/graduate-portrait.png'],
+    images: ['/images/graduate-portrait1.jpg'],
   },
 }
 

@@ -7,6 +7,7 @@
 -- Moments / wishes wall
 create table if not exists public.wishes (
   id uuid primary key default gen_random_uuid(),
+  instance_id text not null default 'default',
   name text not null default 'A well-wisher',
   message text not null check (char_length(message) between 1 and 500),
   hearts integer not null default 0 check (hearts >= 0),
@@ -18,6 +19,7 @@ create table if not exists public.wishes (
 -- Blessings wall
 create table if not exists public.blessings (
   id uuid primary key default gen_random_uuid(),
+  instance_id text not null default 'default',
   label text not null check (char_length(label) between 1 and 40),
   hearts integer not null default 0 check (hearts >= 0),
   status text not null default 'visible'
@@ -28,6 +30,7 @@ create table if not exists public.blessings (
 -- Event RSVPs
 create table if not exists public.rsvps (
   id uuid primary key default gen_random_uuid(),
+  instance_id text not null default 'default',
   name text not null check (char_length(name) between 1 and 60),
   attending boolean not null,
   guests integer not null default 0 check (guests between 0 and 6),
@@ -35,11 +38,21 @@ create table if not exists public.rsvps (
   check ((attending and guests between 1 and 6) or (not attending and guests = 0))
 );
 
--- Upgrade path: add the moderation column on instances created before it.
+-- Upgrade path: add columns on instances created before them.
 alter table public.wishes add column if not exists status text
   not null default 'visible' check (status in ('visible', 'hidden'));
 alter table public.blessings add column if not exists status text
   not null default 'visible' check (status in ('visible', 'hidden'));
+
+-- Upgrade path for shared-Supabase multi-instance setups: adds the per-site
+-- discriminator on instances created before it. Unset NEXT_PUBLIC_INSTANCE_ID
+-- sites keep using 'default'.
+alter table public.wishes add column if not exists instance_id text
+  not null default 'default';
+alter table public.blessings add column if not exists instance_id text
+  not null default 'default';
+alter table public.rsvps add column if not exists instance_id text
+  not null default 'default';
 
 -- Row Level Security: everyone can read visible rows and write, since this is
 -- a public guestbook. No auth required. Moderation happens by flipping a
@@ -72,9 +85,10 @@ create policy "public insert blessings" on public.blessings
 create policy "public insert rsvps" on public.rsvps
   for insert with check (true);
 
--- Count of guests who plan to attend, exposed without revealing names.
--- Security definer so it bypasses the row-level read restriction.
-create or replace function public.count_attending()
+-- Count of guests who plan to attend for a given instance, exposed without
+-- revealing names. Security definer so it bypasses the row-level read
+-- restriction.
+create or replace function public.count_attending(p_instance_id text)
 returns integer
 language sql
 security definer
@@ -82,7 +96,7 @@ set search_path = public
 as $$
   select coalesce(sum(guests), 0)::integer
   from public.rsvps
-  where attending = true
+  where attending = true and instance_id = p_instance_id
 $$;
 
 -- Race-safe heart increments (avoids lost updates from concurrent likes).
@@ -111,15 +125,18 @@ $$;
 
 revoke execute on function public.increment_wish_hearts(uuid, int) from public;
 revoke execute on function public.increment_blessing_hearts(uuid, int) from public;
-revoke execute on function public.count_attending() from public;
+revoke execute on function public.count_attending(text) from public;
 grant execute on function public.increment_wish_hearts(uuid, int) to anon, authenticated;
 grant execute on function public.increment_blessing_hearts(uuid, int) to anon, authenticated;
-grant execute on function public.count_attending() to anon, authenticated;
+grant execute on function public.count_attending(text) to anon, authenticated;
 
--- Ordering helper indexes for the walls.
-create index if not exists wishes_created_at_idx on public.wishes (created_at desc);
-create index if not exists blessings_created_at_idx on public.blessings (created_at desc);
-create index if not exists rsvps_created_at_idx on public.rsvps (created_at desc);
+-- Ordering helper indexes for the walls, scoped per instance.
+create index if not exists wishes_instance_created_at_idx
+  on public.wishes (instance_id, created_at desc);
+create index if not exists blessings_instance_created_at_idx
+  on public.blessings (instance_id, created_at desc);
+create index if not exists rsvps_instance_created_at_idx
+  on public.rsvps (instance_id, created_at desc);
 
 -- Enable live updates for the public guestbook walls. The blocks are safe to
 -- re-run after the tables have already been added to the publication.
