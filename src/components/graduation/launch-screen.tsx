@@ -85,18 +85,18 @@ export function LaunchScreen({ onLaunch }: Props) {
             transition={{ duration: 0.6, ease: 'easeOut' }}
             className="glass relative w-full max-w-xl rounded-3xl border border-primary/30 p-6 shadow-2xl shadow-primary/20 sm:p-8"
           >
-            <div className="mb-6 flex items-center justify-between border-b border-border pb-4">
-              <span className="font-mono text-sm font-bold tracking-wider text-primary sm:text-base">
+            <div className="mb-6 flex items-center justify-between gap-3 border-b border-border pb-4">
+              <span className="min-w-0 truncate font-mono text-xs font-bold tracking-wider text-primary sm:text-base">
                 {'>_ GRADUATION_LAUNCH.SH'}
               </span>
-              <span className="flex gap-1.5">
+              <span className="flex shrink-0 gap-1.5">
                 <span className="h-3 w-3 rounded-full bg-destructive/80" />
                 <span className="h-3 w-3 rounded-full bg-accent" />
                 <span className="h-3 w-3 rounded-full bg-primary" />
               </span>
             </div>
 
-            <div className="min-h-[220px] space-y-3 font-mono text-sm leading-relaxed sm:text-base">
+            <div className="min-h-[220px] space-y-3 break-words font-mono text-[13px] leading-relaxed sm:text-base">
               {LINES.slice(0, visibleLines).map((line, i) => (
                 <motion.p
                   key={line}

@@ -26,7 +26,7 @@ export function Hero() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2, duration: 0.6 }}
-        className="text-balance text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-6xl md:text-7xl lg:text-8xl"
+        className="text-balance text-[2.1rem] font-extrabold leading-[1.05] tracking-tight min-[420px]:text-4xl sm:text-6xl md:text-7xl lg:text-8xl"
       >
         <span className="text-foreground">Congratulations,</span>
         <span className="text-gradient animate-shimmer mt-2 block font-[family-name:var(--font-cormorant)] font-semibold tracking-normal">

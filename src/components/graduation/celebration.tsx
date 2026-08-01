@@ -18,9 +18,24 @@ import { celebrationEvent } from '@/lib/celebration-data'
 export function Celebration() {
   const [launched, setLaunched] = useState(false)
 
+  const sections = [
+    ['hero', 'Welcome'],
+    ['achievements', 'Achievements'],
+    ['journey', 'Journey'],
+    ['moments', 'Moments'],
+    ['blessings', 'Blessings'],
+    ...(celebrationEvent.rsvpEnabled
+      ? (([['event', 'Event details']] as const))
+      : []),
+    ['memories', 'Memories'],
+  ] as const
+
+  const goTo = (id: string) =>
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+
   return (
     <MotionConfig reducedMotion="user">
-      <main className="relative min-h-screen overflow-x-hidden">
+      <main className="relative min-h-screen overflow-x-hidden pb-28 md:pb-0">
       {!launched && <LaunchScreen onLaunch={() => setLaunched(true)} />}
 
       <BackgroundAudio active={launched} />
@@ -47,23 +62,11 @@ export function Celebration() {
               aria-label="Celebration sections"
               className="glass fixed right-4 top-1/2 z-40 hidden -translate-y-1/2 rounded-full border border-border p-2 md:flex md:flex-col md:gap-2 lg:right-5"
             >
-              {[
-                ['hero', 'Welcome'],
-                ['achievements', 'Achievements'],
-                ['journey', 'Journey'],
-                ['moments', 'Moments'],
-                ['blessings', 'Blessings'],
-                ...(celebrationEvent.rsvpEnabled
-                  ? (([['event', 'Event details']] as const))
-                  : []),
-                ['memories', 'Memories'],
-              ].map(([id, label]) => (
+              {sections.map(([id, label]) => (
                 <button
                   key={id}
                   type="button"
-                  onClick={() =>
-                    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
-                  }
+                  onClick={() => goTo(id)}
                   aria-label={`Go to ${label}`}
                   title={label}
                   className="group flex h-10 w-10 items-center justify-center rounded-full text-xs font-bold text-muted-foreground transition-colors hover:bg-primary/15 hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
@@ -71,6 +74,25 @@ export function Celebration() {
                   <span className="h-2.5 w-2.5 rounded-full bg-current transition-transform group-hover:scale-125" />
                 </button>
               ))}
+            </nav>
+
+            {/* Mobile bottom navigation */}
+            <nav
+              aria-label="Celebration sections"
+              className="glass fixed bottom-4 left-1/2 z-40 w-[calc(100vw-2rem)] max-w-md -translate-x-1/2 rounded-full border border-border p-1.5 md:hidden"
+            >
+              <div className="flex gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                {sections.map(([id, label]) => (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => goTo(id)}
+                    className="whitespace-nowrap rounded-full px-3 py-2 text-xs font-semibold text-muted-foreground transition-colors hover:bg-primary/15 hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
             </nav>
 
             <div className="relative z-10">
