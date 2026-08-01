@@ -67,7 +67,7 @@ export function Hero() {
         <motion.div
           animate={{ y: [0, -10, 0] }}
           transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
-          className="relative w-full max-w-[390px] sm:max-w-[510px] lg:max-w-[580px]"
+          className="relative w-full max-w-[480px] sm:max-w-[620px] lg:max-w-[700px]"
         >
           {/* portrait sits inside the frame's transparent opening */}
           <div
@@ -79,7 +79,7 @@ export function Hero() {
               alt={`Portrait of ${graduate.fullName} in graduation cap and gown`}
               fill
               priority
-              sizes="(min-width: 1024px) 580px, (min-width: 640px) 510px, 100vw"
+              sizes="(min-width: 1024px) 700px, (min-width: 640px) 620px, 100vw"
               className="object-cover"
               style={{ objectPosition: portrait.objectPosition }}
             />
