@@ -1,7 +1,8 @@
 'use client'
 
+import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Heart, GraduationCap } from 'lucide-react'
+import { Heart, GraduationCap, Check } from 'lucide-react'
 import { graduate } from '@/lib/celebration-data'
 import { ShareCardButton } from './share-card-button'
 
@@ -38,36 +39,30 @@ function TelegramIcon({ className }: { className?: string }) {
 }
 
 export function ClosingLetter() {
+  const [copied, setCopied] = useState(false)
+
   const buildText = () => {
     const text = `Celebrating ${graduate.fullName} on graduating — ${graduate.degree}! Leave a moment and a blessing 🎓`
     const url = typeof window !== 'undefined' ? window.location.href : ''
     return { text, url, full: `${text} ${url}` }
   }
 
-  const share = () => {
+  const shareWhatsApp = () => {
     const { full } = buildText()
-    const encoded = encodeURIComponent(full)
-    openApp(`whatsapp://send?text=${encoded}`, `https://wa.me/?text=${encoded}`)
-  }
-
-  const openApp = (appUrl: string, webUrl: string) => {
-    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
-    window.open(isMobile ? appUrl : webUrl, '_blank', 'noopener,noreferrer')
+    const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(full)}`
+    window.open(url, '_blank', 'noopener,noreferrer')
   }
 
   const shareTelegram = () => {
     const { text, url } = buildText()
-    const encodedUrl = encodeURIComponent(url)
-    const encodedText = encodeURIComponent(text)
-    openApp(
-      `tg://msg_url?url=${encodedUrl}&text=${encodedText}`,
-      `https://t.me/share/url?url=${encodedUrl}&text=${encodedText}`,
-    )
+    const shareUrl = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`
+    window.open(shareUrl, '_blank', 'noopener,noreferrer')
   }
 
-  // Instagram & Snapchat have no web share intent — use the native share
-  // sheet when available, otherwise copy the message to the clipboard.
-  const shareNativeOrCopy = async (appUrl: string, webUrl: string) => {
+  // Instagram & Snapchat have no share-composer URL — use the native share
+  // sheet when available, otherwise copy the message to the clipboard and
+  // open the app/site.
+  const shareViaApp = async (webUrl: string) => {
     const { text, url, full } = buildText()
     if (typeof navigator !== 'undefined' && navigator.share) {
       try {
@@ -79,10 +74,12 @@ export function ClosingLetter() {
     }
     try {
       await navigator.clipboard.writeText(full)
+      setCopied(true)
+      window.setTimeout(() => setCopied(false), 2500)
     } catch {
       // clipboard blocked — nothing else to do
     }
-    openApp(appUrl, webUrl)
+    window.open(webUrl, '_blank', 'noopener,noreferrer')
   }
 
   return (
@@ -136,7 +133,7 @@ export function ClosingLetter() {
         <div className="mt-5 flex flex-wrap items-center justify-center gap-3 sm:gap-4">
           <button
             type="button"
-            onClick={share}
+            onClick={shareWhatsApp}
             aria-label="Share on WhatsApp"
             className="flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg transition-transform hover:scale-110 active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
           >
@@ -144,7 +141,7 @@ export function ClosingLetter() {
           </button>
           <button
             type="button"
-            onClick={() => shareNativeOrCopy('instagram://camera', 'https://www.instagram.com/')}
+            onClick={() => void shareViaApp('https://www.instagram.com/')}
             aria-label="Share on Instagram"
             className="flex h-14 w-14 items-center justify-center rounded-full bg-[#E1306C] text-white shadow-lg transition-transform hover:scale-110 active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
           >
@@ -152,7 +149,7 @@ export function ClosingLetter() {
           </button>
           <button
             type="button"
-            onClick={() => shareNativeOrCopy('snapchat://', 'https://www.snapchat.com/')}
+            onClick={() => void shareViaApp('https://www.snapchat.com/')}
             aria-label="Share on Snapchat"
             className="flex h-14 w-14 items-center justify-center rounded-full bg-[#FFFC00] text-black shadow-lg transition-transform hover:scale-110 active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
           >
@@ -167,6 +164,12 @@ export function ClosingLetter() {
             <TelegramIcon className="h-6 w-6" />
           </button>
         </div>
+        {copied && (
+          <p className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-primary">
+            <Check className="h-4 w-4" />
+            Link copied — paste it into the app
+          </p>
+        )}
       </motion.div>
 
       <footer className="mt-24 border-t border-border pt-10 text-center">
